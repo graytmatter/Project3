@@ -174,6 +174,7 @@ app.get('/home', function(req,res){
         grant_type: "refresh_token"
       }
     };
+    console.log(reqOjb);
     request.post(reqObj, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log("response was ", response, "body was ", body);
@@ -206,11 +207,11 @@ app.get('/home', function(req,res){
           courses.push({name: course.name, url: course.url, updated: false});
         }
       }else{
+        console.log("status is ", response.statusCode);
+        console.log("error ", error);
         if(response.statusCode == "401"){ //is of the type token expired
           useRefreshToken();
         }
-        console.log("status is ", response.statusCode);
-        console.log("error ", error);
       }
       callback();
     });
