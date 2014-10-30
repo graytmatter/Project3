@@ -1,0 +1,12 @@
+<% include partials/header.ejs %>
+	<div class="container">
+	<h1 class="text-center"> Assign-Monitor</h1>
+	<br>
+  <h1 class="text-center"><a href="/login" class = "btn btn-primary btn-lg">Log in</a></h1>
+	</div>
+	<% if(typeof message !== 'undefined') {%>
+		<div class="alert alert-danger text-center">
+		<%= message %>
+		</div>
+		<% }%>
+<% include partials/footer.ejs %>

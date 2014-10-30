@@ -1,0 +1,41 @@
+<% include partials/header.ejs%>
+	<%  if (!isAuthenticated){ %>
+		<br>
+		<div class="alert alert-warning">
+		<a href="/login">You must be logged in to view this page</a>
+		</div>
+	<%  } else {%>
+	<h1>Hello, <%= user.username %> - welcome to our website!</h1>
+	<a href="/logout" class = "btn btn-danger btn-lg">Log out here</a>
+<br>
+
+	<div class="container">
+		<div class="row">
+  		<div class="col-md-8">
+				<br>
+				<form id="signUp" action="/submit" method = "post">
+					<p id= "submit">
+					<input type="submit" value="Add Classes!" class = "btn btn-primary">
+					</p>
+				</form>
+				<form id ="create" action="">
+					<input type="submit" value="Add Field" class = "btn btn-primary">
+				</form>
+
+
+  		</div>
+  		<div class="col-md-4">
+  			<% if (courses.length>0){courses.forEach(function(course){%>
+  				<% if(course.update){ %>
+							<p>You have <%= course.name %> Homework</p>
+					<% }else{ %>
+							<p>You don't have <%= course.name %> Homework</p>
+					<% } %>
+				<% });} %>
+			</div>	
+	</div>
+
+
+<script src="/signup.js"></script>
+	<%  }%>
+<% include partials/footer.ejs%>

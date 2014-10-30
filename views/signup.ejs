@@ -1,0 +1,28 @@
+<% include partials/header.ejs %>
+<h1> Sign Up Form</h1>
+
+		<% if(typeof message !== 'undefined') {%>
+		<div class="alert alert-danger">
+		<%= message %>
+		</div>
+		<% }%>
+
+<br>
+<form id ="create" action="">
+	<input type="submit" value="Add Class" class = "btn btn-primary">
+</form>
+<br>
+<form id="signUp"action="/submit" method = "post">
+	<p>
+		<label for="username">Username: </label> <input type="text" name="username" id="username" autofocus value = <%=username %>>
+	</p>
+	<p>
+	<label for="password">Password: </label> <input type="password" name="password" id="password">
+	</p>
+	<p id= "submit">
+	<input type="submit" value="Sign up!" class = "btn btn-primary">
+	</p>
+	<a href="/login">Already have an account? Log in here</a>
+</form>
+<script src="/signup.js"></script>
+<% include partials/footer.ejs %>
