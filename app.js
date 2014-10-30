@@ -225,7 +225,7 @@ app.post('/submit', function(req,res){
   var user = req.user;
 
   var makeClass = function(course){
-    console.log(i, course);
+    console.log(course);
     console.log("url is ", course.url);
     console.log("parsed it is ", parseGDoc(course.url));
 
