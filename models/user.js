@@ -60,6 +60,10 @@ module.exports = function (sequelize, DataTypes){
     } //close classMethods outer
 
   ); // close define user
+function blah(accessToken, refreshToken, params, profile, done) {
+  console.log(params.expires_in);
+  // save tokens and expiry time
+}
 
 console.log("Client id " + process.env.CLIENTSECRET + "callback is " +process.env.CALLBACKURL);
 passport.use(new GoogleStrategy({
@@ -70,6 +74,7 @@ passport.use(new GoogleStrategy({
     // realm: "http://127.0.0.1:3000"
   },
   function(accessToken, refreshToken, profile, done) {
+    blah(accessToken, refreshToken, params, profile, done);
     console.log("profile.id is", profile.id);
     console.log("accessToken is", accessToken);
     console.log("refreshToken is", refreshToken);    

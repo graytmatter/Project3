@@ -163,6 +163,9 @@ app.get('/home', function(req,res){
 //     console.log(profile.displayName, ':', profile.tagline);
 //   });
   var courses = [];
+  var useRefreshToken = function(){
+
+  };
   var makeQuery = function(course, callback){
     var url = 'https://www.googleapis.com/drive/v2/files/' + course.googleId;
     var reqObj = {
@@ -186,6 +189,9 @@ app.get('/home', function(req,res){
           courses.push({name: course.name, url: course.url, updated: false});
         }
       }else{
+        if(err === "I HATE YOU AND THE ACCES TOKEN SUCKS"){ //is of the type token expired
+          useRefreshToken();
+        }
         console.log("status is ", response.statusCode);
         console.log("error ", error);
       }
