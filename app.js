@@ -164,7 +164,24 @@ app.get('/home', function(req,res){
 //   });
   var courses = [];
   var useRefreshToken = function(){
+    var reqObj = {
+      url: "https://accounts.google.com/o/oauth2/token",
+      headers: {'Authorization': 'Bearer ' + req.user.accessToken},
+      body: {
+        refresh_token: req.user.refreshToken,
+        client_id: process.env.CLIENTID,
+        client_secret: process.env.CLIENTSECRET,
+        grant_type: "refresh_token"
+      }
+    };
+    request.post(reqObj, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log("response was ", response, "body was ", body);
+        // req.user.updateAttributes({
 
+        // });
+      }
+    });
   };
   var makeQuery = function(course, callback){
     var url = 'https://www.googleapis.com/drive/v2/files/' + course.googleId;
@@ -189,9 +206,9 @@ app.get('/home', function(req,res){
           courses.push({name: course.name, url: course.url, updated: false});
         }
       }else{
-        // if(err === "I HATE YOU AND THE ACCES TOKEN SUCKS"){ //is of the type token expired
-        //   useRefreshToken();
-        // }
+        if(response.statusCode == "401"){ //is of the type token expired
+          useRefreshToken();
+        }
         console.log("status is ", response.statusCode);
         console.log("error ", error);
       }
