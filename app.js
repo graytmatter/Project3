@@ -224,10 +224,10 @@ app.post('/submit', function(req,res){
   console.log("*****classes",classes,"classes*****");
   var user = req.user;
 
-  var makeClass = function(course){
+  var makeClass = function(course, callback){
     console.log(course);
     console.log("url is ", course.url);
-    console.log("parsed it is ", parseGDoc(course.url[0]));
+    console.log("parsed it is ", parseGDoc(course.url));
 
   db.Class.findOrCreate({where: {name: course.name, googleId: parseGDoc(course.url)}}
         ).success(function(thing, created){
@@ -237,6 +237,7 @@ app.post('/submit', function(req,res){
             console.log("found class ", thing);
           }
         thing.addUser(user);
+        callback();
       });
   };
   async.each(classes, makeClass, function(err){
