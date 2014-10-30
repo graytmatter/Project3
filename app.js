@@ -227,7 +227,7 @@ app.post('/submit', function(req,res){
   var makeClass = function(course, callback){
     console.log(course);
     console.log("url is ", course.url);
-    console.log("parsed it is ", parseGDoc(course.url));
+    console.log("parsed it is ", parseGDoc(course.url[0]));
 
   db.Class.findOrCreate({where: {name: course.name, googleId: parseGDoc(course.url)}}
         ).success(function(thing, created){
