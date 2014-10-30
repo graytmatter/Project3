@@ -151,39 +151,6 @@ app.get('/login',
   });
 
 
-var makeQuery = function(course){
-  var url = 'https://www.googleapis.com/drive/v2/files/' + course.googleId;
-  var reqObj = {
-    url: url,
-    headers: {'Authorization': 'Bearer ' + req.user.accessToken}
-  };
-  console.log("reqObj", reqObj);
-  request(reqObj, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      var date = new Date(JSON.parse(body).modifiedDate);
-      var today = Date.now() - Date.now()%86400000;
-      console.log(date);
-      // console.log("body is ", date.getTime()); // Print the google web page.
-      // console.log(Date.now() - Date.now()%86400000);
-      // console.log(Date.now() - Date.now()%86400000 > date.getTime());
-      if(date.getTime()>today.getTime()){
-        console.log("you have " + course.name + " homework");
-      }else{
-        console.log("you do not have " + course.name + " homework");
-      }
-      res.render("home", {
-        //runs a function to see if the user is authenticated - returns true or false
-        isAuthenticated: req.isAuthenticated(),
-        //this is our data from the DB which we get from deserializing
-        user: req.user
-      });
-    }else{
-      console.log("status is ", response.statusCode);
-      console.log("error ", error);
-    }
-  });
-};
-
 app.get('/home', function(req,res){
   console.log("made it home");
 // getAccessToken(oauth2Client, function() {
@@ -244,64 +211,32 @@ console.log(req.user);
 });
 
 
-app.post("/posts", function (req, res) {
-  var authorParams = req.body.author;
-  var postParams = req.body.post;
-  var tagParams = req.body.tags;
-
-  var tagArr = tagParams.split(",");
-
-  var createTags = function (post) {
-    if (tagArr.length === 0) {
-      res.redirect("/posts");
-    } else {
-      var tagObj = {name: tagArr.pop()};
-      db.Tag.findOrCreate({
-        where: tagObj,
-        defaults: tagObj
-      }).done(function (err, tag, created) {
-        post.addTag(tag);
-        createTags(post);
-      });
-    }
-  };
-});
 // on submit, create a new users using form values
 app.post('/submit', function(req,res){
   console.log("body is ",req.body, "user is ", req.user, "classes are ", req.body.classes);
   var classes = req.body.classes;
   console.log("*****classes",classes,"classes*****");
   var user = req.user;
-  for(var i in classes){
-    console.log(i, classes[i]);
-    console.log("url is ", classes[i].url);
-    console.log("parsed it is ", parseGDoc(classes[i].url));
 
-  db.Class.findOrCreate({where: {name: classes[i].name, googleId: parseGDoc(classes[i].url)}}
+  var makeClass = function(course){
+    console.log(i, course);
+    console.log("url is ", course.url);
+    console.log("parsed it is ", parseGDoc(course.url));
+
+  db.Class.findOrCreate({where: {name: course.name, googleId: parseGDoc(course.url)}}
         ).success(function(thing, created){
-        console.log("adding class", thing);
+          if(created){
+            console.log("adding class ", thing);
+          }else{
+            console.log("found class ", thing);
+          }
         thing.addUser(user);
       });
-
-  }
-  res.redirect("/home");
-//   db.User.createNewUser(req.body.username, req.body.password,
-//   function(err){
-//     res.render("index", {message: err.message, username: req.body.username});
-//   },
-//   function(success){    
-// //tag is a single class object in the array returned 
-//     classes = req.body.classes;
-//     classes.forEach(function(tag){
-// //db.Author.findOrCreate({ name: author},{name: author, age:49}).done(function(authorHunt){
-//       db.Class.findOrCreate({where: {url: tag.url}}, {name: tag.name, url: tag.url}
-//         ).success(function(tag, created){
-//         console.log("adding class", tag);
-//         tag.addUser(newUser);
-//       });
-//     });
-//     res.render("index", {message: success.message, username: req.body.username});
-//   });
+  };
+  async.each(classes, makeClass, function(err){
+    console.log("we've made all the classes");      
+    res.redirect("/home");
+  });
 });
 
 // authenticate users when logging in - no need for req,res passport does this for us
