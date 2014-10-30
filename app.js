@@ -167,7 +167,7 @@ app.get('/home', function(req,res){
     var reqObj = {
       url: "https://accounts.google.com/o/oauth2/token",
       headers: {'Authorization': 'Bearer ' + req.user.accessToken},
-      body: {
+      form: {
         refresh_token: req.user.refreshToken,
         client_id: process.env.CLIENTID,
         client_secret: process.env.CLIENTSECRET,
