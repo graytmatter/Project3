@@ -271,7 +271,7 @@ var parseGDoc = function(url){
   console.log("url is", url);
   // var reggy = new RegExp()
   var id = url.trim().match("/d/[a-zA-Z0-9_]*(?=\/)");
-  console.log(id);
+  console.log("id is ", id);
   id = id[0].slice(3,id[0].length);
   console.log(id);
   return id;
