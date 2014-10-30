@@ -189,9 +189,9 @@ app.get('/home', function(req,res){
           courses.push({name: course.name, url: course.url, updated: false});
         }
       }else{
-        if(err === "I HATE YOU AND THE ACCES TOKEN SUCKS"){ //is of the type token expired
-          useRefreshToken();
-        }
+        // if(err === "I HATE YOU AND THE ACCES TOKEN SUCKS"){ //is of the type token expired
+        //   useRefreshToken();
+        // }
         console.log("status is ", response.statusCode);
         console.log("error ", error);
       }
