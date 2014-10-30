@@ -178,9 +178,9 @@ app.get('/home', function(req,res){
     request.post(reqObj, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log("response was ", response, "body was ", body);
-        // req.user.updateAttributes({
-
-        // });
+        req.user.updateAttributes({
+          accessToken : body.access_token
+        });
       }
     });
   };
