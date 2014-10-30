@@ -174,7 +174,7 @@ app.get('/home', function(req,res){
         grant_type: "refresh_token"
       }
     };
-    console.log(reqOjb);
+    console.log(reqObj);
     request.post(reqObj, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         console.log("response was ", response, "body was ", body);
