@@ -201,7 +201,9 @@ app.get('/home', function(req,res){
     request(reqObj, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         var date = new Date(JSON.parse(body).modifiedDate);
+        console.log(date);
         var today = Date.now() - Date.now()%86400000;
+        console.log(today);
         console.log(date);
         // console.log("body is ", date.getTime()); // Print the google web page.
         // console.log(Date.now() - Date.now()%86400000);
