@@ -35,7 +35,7 @@
   				<% console.log("course is ", course) %>
   				<% console.log ("course.update is ", course.updated) %>
   				<% if(course.updated){ %>
-							<a href="course.url"><p>You have <%= course.name %> Homework</p></a>
+							<a href=<%= course.url %>><p>You have <%= course.name %> Homework</p></a>
 					<% }else{ %>
 							<p>You don't have <%= course.name %> Homework</p>
 					<% } %>
