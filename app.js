@@ -162,8 +162,10 @@ app.get('/home', function(req,res){
 //     }
 //     console.log(profile.displayName, ':', profile.tagline);
 //   });
+  var refresh = false;
   var courses = [];
   var useRefreshToken = function(){
+    refresh = true;
     var reqObj = {
       url: "https://accounts.google.com/o/oauth2/token",
       headers: {'Authorization': 'Bearer ' + req.user.accessToken},
@@ -225,14 +227,15 @@ console.log(req.user);
   req.user.getClasses().done(function(err,classes){
     async.each(classes, makeQuery, function(err){
     console.log("hi1");      
-            res.render("home", {
-        //runs a function to see if the user is authenticated - returns true or false
-        isAuthenticated: req.isAuthenticated(),
-        //this is our data from the DB which we get from deserializing
-        user: req.user,
-        //this is the array of courses for this user with a updated key
-        courses: courses
-      });
+        res.render("home", {
+          refresh: refresh,
+          //runs a function to see if the user is authenticated - returns true or false
+          isAuthenticated: req.isAuthenticated(),
+          //this is our data from the DB which we get from deserializing
+          user: req.user,
+          //this is the array of courses for this user with a updated key
+          courses: courses
+        });
     // if any of the saves produced an error, err would equal that error
     });
     console.log("hi");
