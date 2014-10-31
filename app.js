@@ -210,7 +210,7 @@ app.get('/home', function(req,res){
         // console.log(Date.now() - Date.now()%86400000 > date.getTime());
         if(date.getTime()>today){
           console.log("you have " + course.name + " homework");
-          courses.push({name: course.name, url: course.url, updated: true});
+          courses.push({name: course.name, url: "https://docs.google.com/document/d/"+course.googleId, updated: true});
         }else{
           console.log("you do not have " + course.name + " homework");
           courses.push({name: course.name, url: course.url, updated: false});
