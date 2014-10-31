@@ -204,11 +204,11 @@ app.get('/home', function(req,res){
         console.log(date);
         var today = Date.now() - Date.now()%86400000;
         console.log(today);
-        console.log(date);
+        console.log(date.getTime());
         // console.log("body is ", date.getTime()); // Print the google web page.
         // console.log(Date.now() - Date.now()%86400000);
         // console.log(Date.now() - Date.now()%86400000 > date.getTime());
-        if(date>today){
+        if(date.getTime()>today){
           console.log("you have " + course.name + " homework");
           courses.push({name: course.name, url: course.url, updated: true});
         }else{
