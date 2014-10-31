@@ -1,6 +1,8 @@
 .index-container{
 	background-image: url(http://creativekidscenter.net/sitebuilder/images/blackboard-906x636.png);
 	background-size: cover;
+	width: 100%;
+	height: 700px;
 }
 
 .chalk{
