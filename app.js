@@ -177,12 +177,13 @@ app.get('/home', function(req,res){
     console.log(reqObj);
     request.post(reqObj, function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        // console.log("response was ", response, "body was ", body);
-        console.log(req.user.accessToken);
+        console.log("body.access_token ", body.access_token);
+        console.log("before accessToken", req.user.accessToken);
         req.user.updateAttributes({
           accessToken : body.access_token
-        }).done(function(){
-          console.log(req.user.accessToken);
+        }).done(function(err, dbUser){
+          console.log("after accessToken", req.user.accessToken);
+          console.log("dbUser.accessToken", dbUser.accessToken);
         });
       }
     });
