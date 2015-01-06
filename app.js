@@ -8,7 +8,7 @@ var express = require("express"),
   flash = require('connect-flash'),
   request = require("request"),
   async = require("async"),
-  app = express(); 
+  app = express();
 //google stuff
 // var readline = require('readline');
 
@@ -101,9 +101,10 @@ passport.deserializeUser(function(id, done){
 });
 
 //you get sent here from /login by google
-app.get('/auth/google/callback', 
+app.get('/oauth2callback/',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
+    //console.log(req,res);
     console.log("on my way home");
 //     oauth2Client.setCredentials({
 //   access_token: 'ACCESS TOKEN HERE',
@@ -141,10 +142,10 @@ app.get('/login',
   passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/userinfo.profile',
                                             'https://www.googleapis.com/auth/userinfo.email',
                                             "https://www.googleapis.com/auth/drive.readonly",
-                                            "https://www.google.com/m8/feeds", 
-                                            "https://www.googleapis.com/auth/userinfo.email", 
+                                            "https://www.google.com/m8/feeds",
+                                            "https://www.googleapis.com/auth/userinfo.email",
                                             "https://www.googleapis.com/auth/userinfo.profile"
-                                            ], accessType: 'offline', approvalPrompt: 'force' }),  function(req, res){
+                                            ], redirect_uri:"http://localhost:3000/auth/google/callback",accessType: 'offline', approvalPrompt: 'force' }),  function(req, res){
     console.log("This should never appear");
     // The request will be redirected to Google for authentication, so this
     // function will not be called.
@@ -166,6 +167,7 @@ app.get('/home', function(req,res){
   var courses = [];
   var useRefreshToken = function(){
     refresh = true;
+    console.log("usingRefreshToken");
     var reqObj = {
       url: "https://accounts.google.com/o/oauth2/token",
       headers: {'Authorization': 'Bearer ' + req.user.accessToken},
@@ -176,10 +178,11 @@ app.get('/home', function(req,res){
         grant_type: "refresh_token"
       }
     };
-    console.log(reqObj);
+    // console.log(reqObj);
     request.post(reqObj, function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        body = JSON.parse(body); 
+        console.log("200","error is ", error," response is", response, " body is ",body);
+        body = JSON.parse(body);
         console.log("body.access_token ", body.access_token);
         console.log("before accessToken", req.user.accessToken);
         req.user.updateAttributes({
@@ -188,21 +191,25 @@ app.get('/home', function(req,res){
           console.log("after accessToken", req.user.accessToken);
           console.log("dbUser.accessToken", dbUser.accessToken);
         });
+      }else{
+        //console.log("error is ", error," response is", response, " body is ",body);
       }
     });
   };
   var makeQuery = function(course, callback){
+    // console.log("course is", course);
     var url = 'https://www.googleapis.com/drive/v2/files/' + course.googleId;
     var reqObj = {
       url: url,
-      headers: {'Authorization': 'Bearer ' + req.user.accessToken}
+      headers: {Authorization: 'Bearer ' + req.user.accessToken}
     };
-    console.log("reqObj", reqObj);
+    // console.log("reqObj", reqObj);
     request(reqObj, function (error, response, body) {
+      //console.log("7787997","error is ", error," response is", response.statusCode, " body is ",body);
       if (!error && response.statusCode == 200) {
         var date = new Date(JSON.parse(body).modifiedDate);
         console.log(date);
-        var today = Date.now() - Date.now()%86400000;
+        var today = Date.now() - 86400000;
         console.log(today);
         console.log(date.getTime());
         // console.log("body is ", date.getTime()); // Print the google web page.
@@ -210,10 +217,10 @@ app.get('/home', function(req,res){
         // console.log(Date.now() - Date.now()%86400000 > date.getTime());
         if(date.getTime()>today){
           console.log("you have " + course.name + " homework");
-          courses.push({name: course.name, url: "https://docs.google.com/document/d/"+course.googleId, updated: true});
+          courses.push({name: course.name, url: "https://docs.google.com/document/d/"+course.googleId +"/preview", updated: true});
         }else{
           console.log("you do not have " + course.name + " homework");
-          courses.push({name: course.name, url: course.url, updated: false});
+          courses.push({name: course.name, url: "https://docs.google.com/document/d/"+course.googleId +"/preview", updated: false});
         }
       }else{
         console.log("status is ", response.statusCode);
@@ -225,51 +232,55 @@ app.get('/home', function(req,res){
       callback();
     });
   };
-console.log(req.user);
-  req.user.getClasses().done(function(err,classes){
-    async.each(classes, makeQuery, function(err){
-    console.log("hi1");      
-        res.render("home", {
-          refresh: refresh,
-          //runs a function to see if the user is authenticated - returns true or false
-          isAuthenticated: req.isAuthenticated(),
-          //this is our data from the DB which we get from deserializing
-          user: req.user,
-          //this is the array of courses for this user with a updated key
-          courses: courses
-        });
-    // if any of the saves produced an error, err would equal that error
+// console.log(req.user);
+  if(!req.user){
+    console.log("redirecting to log-in b/c no user");
+    res.render("index", { username: ""});
+  }else{
+    req.user.getClasses().done(function(err,classes){
+      async.each(classes, makeQuery, function(err){
+      console.log("hi1");
+          res.render("home", {
+            refresh: refresh,
+            //runs a function to see if the user is authenticated - returns true or false
+            isAuthenticated: req.isAuthenticated(),
+            //this is our data from the DB which we get from deserializing
+            user: req.user,
+            //this is the array of courses for this user with a updated key
+            courses: courses
+          });
+      // if any of the saves produced an error, err would equal that error
+      });
+      console.log("hi");
     });
-    console.log("hi");
-  });
+  }
 });
 
 
 // on submit, create a new users using form values
 app.post('/submit', function(req,res){
-  console.log("body is ",req.body, "user is ", req.user, "classes are ", req.body.classes);
+  // console.log("body is ",req.body, "user is ", req.user, "classes are ", req.body.classes);
   var classes = req.body.classes;
-  console.log("*****classes",classes,"classes*****");
+  // console.log("*****classes",classes,"classes*****");
   var user = req.user;
 
   var makeClass = function(course, callback){
-    console.log(course);
     console.log("url is ", course.url);
     console.log("parsed it is ", parseGDoc(course.url));
 
-  db.Class.findOrCreate({where: {name: course.name, googleId: parseGDoc(course.url)}}
-        ).success(function(thing, created){
-          if(created){
-            console.log("adding class ", thing);
-          }else{
-            console.log("found class ", thing);
-          }
-        thing.addUser(user);
+    db.Class.findOrCreate({where: {name: course.name, googleId: parseGDoc(course.url)}}
+      ).success(function(klass, created){
+        if(created){
+          console.log("adding class ", klass);
+        }else{
+          console.log("found class ", klass);
+        }
+        klass.addUser(user);
         callback();
       });
   };
   async.each(classes, makeClass, function(err){
-    console.log("we've made all the classes");      
+    console.log("we've made all the classes");
     res.redirect("/home");
   });
 });
@@ -287,8 +298,26 @@ app.get('/logout', function(req,res){
   res.redirect('/');
 });
 
+app.delete('/delete', function(req, res){
+  console.log("deleting", req.body.googleId);
+  var googleId = req.body.googleId;
+  db.Class.find({where: {googleId: googleId}}).done(function(err,klass){
+    if(err){
+      console.log("WE MESSED UP...");
+      console.log(err);
+    }
+    else{
+      klass.removeUser(req.user);
+    }
+    console.log("DIS IS KLASS")
+    console.log(klass)
+    res.send(klass);
+  });
+});
+
 // catch-all for 404 errors
 app.get('*', function(req,res){
+  console.log("404");
   res.status(404);
   res.render('404');
 });
@@ -311,3 +340,4 @@ var parseGDoc = function(url){
 app.listen(process.env.PORT || 3000, function(){
   console.log("get this party started on port 3000");
 });
+

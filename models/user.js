@@ -73,28 +73,34 @@ passport.use(new GoogleStrategy({
     // returnURL : "http://127.0.0.1:3000/auth/google/callback",
     // realm: "http://127.0.0.1:3000"
   },
+  //i think this is a callback for the google stategy
   function(accessToken, refreshToken, profile, done) {
     // blah(accessToken, refreshToken, params, profile, done);
     console.log("profile.id is", profile.id);
     console.log("accessToken is", accessToken);
-    console.log("refreshToken is", refreshToken);    
+    console.log("refreshToken is", refreshToken);
     User.findOrCreate({
       where: {
         googleId: profile.id
       },
       defaults : {
-        accessToken: accessToken, 
-        refreshToken: refreshToken, 
+        accessToken: accessToken,
+        refreshToken: refreshToken,
         }
       }).done(function (err, user, created) {
         // oauth2Client.setCredentials({
         // access_token: user.accessToken,
         // refresh_token: user.refreshToken
         // });
-
-      console.log("err is", err);
-      console.log("user is", user);
-      console.log("created is", created);
+        console.log("err is", err);
+        console.log("user is", user);
+        console.log("created is", created);
+      if(!created){
+        user.updateAttributes({
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        });
+      }
       return done(err, user);
     }).success(function () {console.log("hi");});
   }

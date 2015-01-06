@@ -13,6 +13,11 @@
   font-family: 'Londrina Shadow', cursive;
 }
 
+span.logo{
+	font-size: 25px;
+  font-family: 'Londrina Shadow', cursive;
+}
+
 .container-main{
 	margin: 0px;
 	padding: 0px;

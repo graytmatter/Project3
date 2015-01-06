@@ -20,16 +20,17 @@ myForm.addEventListener("submit", function (event) {
   cInput.setAttribute("type","text");
   cInput.setAttribute("name","classes["+k+"][name]");
   cInput.setAttribute("id","class["+k+"]");
-  //create class input can acces through req.body.sites(.forEach / [i].class) 
+  //create class input can acces through req.body.sites(.forEach / [i].class)
   var uLabel = document.createElement("label");
   uLabel.setAttribute("for","url["+k+"]");
   uLabel.innerHTML = "URL";
+  uLabel.setAttribute("style","margin-left: 28px;");
   //create label for the url input
 	var uInput = document.createElement("input");
 	uInput.setAttribute("type","url");
   uInput.setAttribute("name","classes["+k+"][url]");
   uInput.setAttribute("id","url["+k+"]");
-  //create url input can acces through req.body.sites(.forEach / [i].url) 
+  //create url input can acces through req.body.sites(.forEach / [i].url)
 
 
 	p.appendChild(cLabel);
@@ -42,3 +43,33 @@ myForm.addEventListener("submit", function (event) {
 	//stick the container paragraph at the end before the submit button
 	k += 1;
 	});
+
+
+
+// assuming openFiles is an array of file names
+
+async.each(openFiles, function( file, callback) {
+
+  // Perform operation on file here.
+  console.log('Processing file ' + file);
+
+  if( file.length > 32 ) {
+    console.log('This file name is too long');
+    callback('File name too long');
+  } else {
+    // Do work to process file here
+    console.log('File processed');
+    callback();
+  }
+}, function(err){
+    // if any of the file processing produced an error, err would equal that error
+    if( err ) {
+      // One of the iterations produced an error.
+      // All processing will now stop.
+      console.log('A file failed to process');
+    } else {
+      console.log('All files have been processed successfully');
+    }
+});
+
+

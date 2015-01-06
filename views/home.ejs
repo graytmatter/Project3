@@ -1,55 +1,139 @@
 <% include partials/header.ejs%>
-	<%  if (!isAuthenticated){ %>
-		<br>
-		<div class="alert alert-warning">
-		<a href="/login">You must be logged in to view this page</a>
-		</div>
-	<%  } else {%>
-	<%  if (refresh){ %>
-		<br>
-		<div class="alert alert-warning">
-		<a href="/home">Please Refresh the page</a>
-		</div>
-	<%  }%>
-<div class="container">
-		<div class="row">
-  		<div class="col-md-8">
-  			<h1 class="chalk black">Assign-Monitor </h1>
+<link rel="stylesheet" href="sidebar.css">
+     <% console.log("hi")%>
+  	<%  if (!isAuthenticated){ %>
+  		<br>
+  		<div class="alert alert-warning">
+  		<a href="/login">You must be logged in to view this page</a>
   		</div>
-  		<div class="col-md-4">
-  			<h1><a href="/logout" class = "btn btn-danger btn-lg">Log out here</a></h1>
-			</div>	
-	</div>
-	<br>
-	<div class="container">
-		<div class="row">
-  		<div class="col-md-8">
-				<br>
-				<form id ="create" action="">
-					<input type="submit" value="Add Class" class = "btn btn-primary">
-				</form>
-				<form id="signUp" action="/submit" method = "post">
-					<p id= "submit">
-					<input type="submit" value="Submit" class = "btn btn-primary">
-					</p>
-				</form>
-
-
+  	<%  } else {%>
+  	<%  if (refresh){ %>
+  		<br>
+  		<div class="alert alert-warning">
+  		<a href="/home">Please Refresh the page</a>
   		</div>
-  		<div class="col-md-4">
-  			<% if (courses.length>0){courses.forEach(function(course){%>
-  				<% console.log("course is ", course) %>
-  				<% console.log ("course.update is ", course.updated) %>
-  				<% if(course.updated){ %>
-							<a href=<%= course.url %>><p>You have <%= course.name %> Homework</p></a>
-					<% }else{ %>
-							<p>You don't have <%= course.name %> Homework</p>
-					<% } %>
-				<% });} %>
-			</div>	
-	</div>
+  	<%  }%>
+    <h1></h1>
 
 
+  <div class="container">
+      <div id="wrapper" class="row"> <!-- class="toggled"  use if you recativate menu toggling -->
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper" class="col-sm-3">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                  <p> <span class="logo">AssignManager<span>
+  <span style="top:6px"onclick="settings()"class="glyphicon glyphicon-cog" aria-hidden="true"></span><button href="/logout" class = "hide btn btn-danger btn-lg">Log out here</button></p>
+<!--                     <a href="#menu-toggle" class="btn btn-default menu-toggle" id="toggler-sidebra">
+                      <span class="glyphicon glyphicon-align-justify" aria-hidden="true">
+
+                      </span>
+                    </a> -->
+                </li>
+          <% if (courses.length>0){courses.forEach(function(course){%>
+            <li id="<%= course.url %>" >
+              <% if(course.updated){ %>
+                  <a onclick="iframeChange('<%= course.url %>')"><p><strong>You have <%= course.name %> Homework</strong></p></a>
+              <% }else{ %>
+                  <a onclick="iframeChange('<%= course.url %>')"><p>You don't have <%= course.name %> Homework</p><a>
+              <% } %>
+
+                <button onclick="del('<%= course.url %>')"type="button" class=" delButton hide btn btn-danger">Delete</button>
+            </li>
+          <% });} %>
+          <li>
+          <form id="create" action="" class="hide">
+            <input type="submit" value="Add Class" class = "btn btn-primary">
+          </form>
+          <form id="signUp" action="/submit" method = "post" class="hide">
+            <p id= "submit">
+            <input type="submit" value="Submit" class = "btn btn-primary">
+            </p>
+          </form>
+          </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="col-sm-9">
+<!--<a href="#menu-toggle" class="btn btn-default menu-toggle" id="toggler-content">>
+<span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></a> -->
+          <iframe style:"border-radius:15px;" width="853" height="480" src="https://docs.google.com/document/d/1pmpNkUMK6h6L3orA_VrxdZcMxbQo2qEJNI3e7DdvQ6A/preview" frameborder="0" id="page"></iframe>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+  </div>
+    <!-- Menu Toggle Script -->
+    <script>
+    window.onload =function(){
+      // $("button").toggleClass("hide");
+
+    }
+    // $(".menu-toggle").click(function(e) {
+    //     e.preventDefault();
+    //     $("#wrapper").toggleClass("toggled");
+    // });
+    function iframeChange(url){
+      $("#page").attr('src', url);
+    }
+    function settings(){
+      $("button").slideDown(400);
+      $("button").toggleClass("hide");
+      $("form").toggleClass("hide");
+      if($(".sidebar-brand").height() <100){
+        $(".sidebar-brand").animate({
+          height:120,
+        },400,function(){})
+      }else{
+        $(".sidebar-brand").animate({
+          height:60,
+        },100,function(){})
+      }
+    }
+    $(".delButton").on("click", function(e){
+      console.log($(this).parent().parent().remove())
+    });
+    function del(url){
+        $.ajax({
+          method: "DELETE",
+          url: "/delete",
+          data:{
+            googleId: parseGDoc(url),
+          },
+          error: function(){
+            console.log("delete class error");
+          },
+          success: function(result){
+            //if the ajax query succeds hide the item on the page
+            console.log("delete class success",result);
+            console.log(url);
+            // var foo = "#" + url
+            // console.log(foo);
+            // $(foo).remove();
+          }
+        });
+      }
+      var parseGDoc = function(url){
+        console.log("url is", url);
+        // var reggy = new RegExp()
+        var id = url.trim().match("/d/[^\/]*");
+        console.log("id is ", id);
+        id = id[0].slice(3,id[0].length);
+        console.log(id);
+        return id;
+      };
+    </script>
 <script src="/signup.js"></script>
 	<%  }%>
 <% include partials/footer.ejs%>
